@@ -104,6 +104,11 @@ shinyServer(function(input, output, session) {
         data.frame(x,y)
     })
     
+    getFit <- reactive({
+        xyData = getXYData()
+        fit = lm(xyData$y~xyData$x)
+    })
+    
     output$plot1 <- renderPlot({
 #         par(mar = c(5.1, 4.1, 0, 1))
 #         plot(selectedData(),
@@ -123,11 +128,16 @@ shinyServer(function(input, output, session) {
         g = ggplot(xyData,aes(y = y,x = x))
         g = g  + scale_size(range = c(2, 5), guide = "none" )
         g = g + geom_abline(intercept = b0, slope = b1, colour = "red")
-        g = g + geom_smooth(method="loess", formula=y~x)
+        g = g + geom_smooth(method="lm", formula=y~x)
         g = g + geom_point()
         g = g + labs(list(x=xLabel,y=yLabel, title=titleLabel))
         g = g + theme_bw()
         print(g)
+    })
+    
+    output$summary <- renderPrint({
+        fit <- getFit()
+        summary(fit)
     })
     
     output$view <- renderTable({
