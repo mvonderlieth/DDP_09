@@ -1,12 +1,37 @@
-shinyUI(pageWithSidebar(
-    headerPanel('Stats for MTCARS'),
-    sidebarPanel(
-        selectInput('ycol', 'Y Variable', c("qsec","mpg"),selected="qsec"),
-        selectInput('xcol', 'X Variable', c("wt","disp","hp","drat"),selected="wt"),
-        tableOutput("view")
-    ),
-    mainPanel(
-        plotOutput('plot1'),
-        verbatimTextOutput("summary")
+
+shinyUI(
+    fluidPage(
+        # page title and main title
+        title = "Statistics for a Linear Model and MTCARS",
+        titlePanel("Statistics for a Linear Model and MTCARS"),
+        
+        plotOutput('plot'),
+        
+        hr(),
+        
+        fluidRow(
+            column(3,
+                   h4("Choose model fit predictor and outcome")
+            ),
+            column(3,
+                   selectInput('xcol', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
+            ),
+            column(3,
+                   selectInput('ycol', 'Outcome', c("qsec","mpg"),selected="qsec")
+            )
+        ),
+        
+        hr(),
+        
+        fluidRow(
+            column(5,
+                   h5("Formulas and Values"),
+                   tableOutput("view")
+            ),
+            column(5,
+                   h5("Summary"),
+                   verbatimTextOutput('summary')
+            )
+        )
     )
-))
+)
