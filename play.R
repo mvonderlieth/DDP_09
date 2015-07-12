@@ -4,11 +4,15 @@ library(ggplot2, warn.conflicts = F)
 tidyCars = mtcars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
 row.names(tidyCars) = row.names(mtcars)
 
-xcol = "drat"
+xcol = "wt"
 ycol = "qsec"
 
 x = tidyCars[,xcol]
 y = tidyCars[,ycol]
+xyDf = data.frame(x,y) %>% arrange(x)
+
+x = xyDf$x
+y = xyDf$y
 fit = lm(y~x)
 
 df = data.frame(var = character(0), val = character(0), stringsAsFactors = F)

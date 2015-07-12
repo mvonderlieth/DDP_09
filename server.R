@@ -6,10 +6,18 @@ tidyCars = mtcars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs
 row.names(tidyCars) = row.names(mtcars)
 
 shinyServer(function(input, output, session) {
-    # Combine the selected variables into a new data frame
-    getStatsData <- reactive({
+    #
+    getXYData <- reactive({
         x = tidyCars[,input$xcol]
         y = tidyCars[,input$ycol]
+        xyDf = data.frame(x,y) %>% arrange(x)
+    })
+    
+    # Combine the selected variables into a new data frame
+    getStatsData <- reactive({
+        xyData = getXYData()
+        x = xyData$x
+        y = xyData$y
         
         df = data.frame(var = character(0), val = character(0), stringsAsFactors = F)
         df[nrow(df) + 1,] = c("x",toString(x))
@@ -95,13 +103,6 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("actual y row 1",toString(sampleYActual))
         df[nrow(df) + 1,] = c("estimated y=b0 - (b1 * actual x)",toString(sampleYEstimated))
         df
-    })
-    
-    getXYData <- reactive({
-        x = tidyCars[,input$xcol]
-        y = tidyCars[,input$ycol]
-        # fit = lm(y~x)
-        data.frame(x,y)
     })
     
     getFit <- reactive({
