@@ -7,17 +7,20 @@ row.names(tidyCars) = row.names(mtcars)
 
 shinyServer(function(input, output, session) {
     # return sorted xy data based on user input
-    getXYData <- reactive({
-        x = tidyCars[,input$xcol]
-        y = tidyCars[,input$ycol]
-        xyDf = data.frame(x,y) %>% arrange(x)
+    getCarData <- reactive({
+        predictor = input$predictor
+        response = input$response
+        tc = eval(substitute(arrange(tidyCars, var),list(var = as.name(predictor))))
+        tc
     })
     
     # Combine the selected variables into a new data frame
     getStatsData <- reactive({
-        xyData = getXYData()
-        x = xyData$x
-        y = xyData$y
+        carData = getCarData()
+        predictor = input$predictor
+        response = input$response
+        x = carData[,predictor]
+        y = carData[,response]
         
         df = data.frame(var = character(0), val = character(0), stringsAsFactors = F)
         df[nrow(df) + 1,] = c("x",toString(x))
@@ -110,8 +113,8 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("t statistic=(r-0)/ sqrt((1-r2)/(n-2))",toString(tStat))
         
         df[nrow(df) + 1,] = c("Actual Values from first x and y","==========")
-        sampleXActual = tidyCars[1,xcol]
-        sampleYActual = tidyCars[1,ycol]
+        sampleXActual = tidyCars[1,predictor]
+        sampleYActual = tidyCars[1,response]
         sampleYEstimated = b0 - (b1 * sampleXActual)
         df[nrow(df) + 1,] = c("actual x row 1",toString(sampleXActual))
         df[nrow(df) + 1,] = c("actual y row 1",toString(sampleYActual))
@@ -120,22 +123,30 @@ shinyServer(function(input, output, session) {
     })
     
     getFit <- reactive({
-        xyData = getXYData()
-        fit = lm(xyData$y~xyData$x)
+        carData = getCarData()
+        predictor = input$predictor
+        response = input$response
+        x = carData[,predictor]
+        y = carData[,response]
+        
+        fit = lm(y~x)
     })
     
     output$plot <- renderPlot({
-        xyData = getXYData()
+        carData = getCarData()
+        predictor = input$predictor
+        response = input$response
+
         statsData = getStatsData()
         
         b0 = as.numeric(statsData[19,2])
         b1 = as.numeric(statsData[18,2])
         
-        xLabel = input$xcol
-        yLabel = input$ycol
-        titleLabel = paste(yLabel," as a function of ", xLabel)
+        xLabel = predictor
+        yLabel = response
+        titleLabel = paste(yLabel," as predicted by ", xLabel)
         
-        g = ggplot(xyData,aes(y = y,x = x))
+        g = eval(substitute(ggplot(carData, aes(y=var1,x=var2)),list(var1 = as.name(response),var2 = as.name(predictor))))
         g = g  + scale_size(range = c(2, 5), guide = "none" )
         g = g + geom_abline(intercept = b0, slope = b1, colour = "red")
         g = g + geom_smooth(method="lm", formula=y~x)

@@ -22,10 +22,10 @@ shinyUI(
                    h4("Choose model predictor and response")
             ),
             column(3,
-                   selectInput('xcol', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
+                   selectInput('predictor', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
             ),
             column(3,
-                   selectInput('ycol', 'Response', c("qsec","mpg"),selected="qsec")
+                   selectInput('response', 'Response', c("qsec","mpg"),selected="qsec")
             )
         ),
         
