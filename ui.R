@@ -4,27 +4,35 @@ shinyUI(
         # page title and main title
         title = "Statistics for a Linear Model and MTCARS",
         titlePanel("Statistics for a Linear Model and MTCARS"),
-        
-        plotOutput('plot'),
-        
-        hr(),
-        
-        fluidRow(
-            column(3,
-                   h4("Choose model fit predictor and outcome")
+
+        sidebarLayout(
+            sidebarPanel(
+                helpText("Create demographic maps with information from the 2010 US Census.")
             ),
-            column(3,
-                   selectInput('xcol', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
-            ),
-            column(3,
-                   selectInput('ycol', 'Outcome', c("qsec","mpg"),selected="qsec")
+            
+            mainPanel(
+                plotOutput('plot')
             )
         ),
         
         hr(),
         
         fluidRow(
-            column(5,
+            column(3,
+                   h4("Choose model predictor and response")
+            ),
+            column(3,
+                   selectInput('xcol', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
+            ),
+            column(3,
+                   selectInput('ycol', 'Response', c("qsec","mpg"),selected="qsec")
+            )
+        ),
+        
+        hr(),
+        
+        fluidRow(
+            column(7,
                    h5("Formulas and Values"),
                    tableOutput("view")
             ),

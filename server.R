@@ -6,7 +6,7 @@ tidyCars = mtcars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs
 row.names(tidyCars) = row.names(mtcars)
 
 shinyServer(function(input, output, session) {
-    #
+    # return sorted xy data based on user input
     getXYData <- reactive({
         x = tidyCars[,input$xcol]
         y = tidyCars[,input$ycol]
@@ -24,78 +24,92 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("y",toString(y))
         
         # compute sums
+        df[nrow(df) + 1,] = c("Computed values","=========")
         n = length(x)
         df[nrow(df) + 1,] = c("n",toString(n))
         
-        sumx = sum(x)
-        df[nrow(df) + 1,] = c("sum(x)",toString(sumx))
+        xsum = sum(x)
+        df[nrow(df) + 1,] = c("xsum=sum(x)",toString(xsum))
         
-        sumy = sum(y)
-        df[nrow(df) + 1,] = c("sum(y)",toString(sumy))
+        ysum = sum(y)
+        df[nrow(df) + 1,] = c("ysum=sum(y)",toString(ysum))
         
         x2 = (x^2)
-        df[nrow(df) + 1,] = c("x2",toString(x2))
+        df[nrow(df) + 1,] = c("x2=x^2",toString(x2))
         
         y2 = (y^2)
-        df[nrow(df) + 1,] = c("y^2",toString(y2))
+        df[nrow(df) + 1,] = c("y2=y^2",toString(y2))
         
-        sumx2 = sum(x2)
-        df[nrow(df) + 1,] = c("sum(x2)",toString(sumx2))
+        xsum2 = sum(x2)
+        df[nrow(df) + 1,] = c("xsum2=sum(x2)",toString(xsum2))
         
-        sumy2 = sum(y2)
-        df[nrow(df) + 1,] = c("sum(y2)",toString(sumy2))
+        ysum2 = sum(y2)
+        df[nrow(df) + 1,] = c("ysum2=m2=sum(y2)",toString(ysum2))
         
         xy = (x*y)
-        df[nrow(df) + 1,] = c("x*y",toString(xy))
+        df[nrow(df) + 1,] = c("xy=x*y",toString(xy))
         
-        sumxy = sum(xy)
-        df[nrow(df) + 1,] = c("sum(xy)",toString(sumxy))
+        xysum = sum(xy)
+        df[nrow(df) + 1,] = c("xysum=sum(xy)",toString(xysum))
         
         # compute model
-        meanx = mean(x)
-        df[nrow(df) + 1,] = c("mean(x)",toString(meanx))
+        xmean = xsum/n
+        df[nrow(df) + 1,] = c("xmean=xsum/n",toString(xmean))
         
-        meany = mean(y)
-        df[nrow(df) + 1,] = c("mean(y)",toString(meany))
+        ymean = ysum/n
+        df[nrow(df) + 1,] = c("ymean=ysum/n",toString(ymean))
         
-        sdx = sd(x)
-        df[nrow(df) + 1,] = c("sd(x)",toString(sdx))
+        ssxy = xysum - (xsum*ysum)/n
+        df[nrow(df) + 1,] = c("ssxy=xysum - (xsum*ysum)/n",toString(ssxy))
         
-        sdy = sd(y)
-        df[nrow(df) + 1,] = c("sd(y)",toString(sdy))
+        ssx = xsum2 - xsum^2/n
+        df[nrow(df) + 1,] = c("ssx=xsum2 - xsum^2/n",toString(ssx))
         
-        ssxy = sumxy - (sumx*sumy)/n
-        df[nrow(df) + 1,] = c("ssxy = sumxy - (sumx*sumy)/n",toString(ssxy))
-        
-        ssx = sumx2 - sumx^2/n
-        df[nrow(df) + 1,] = c("ssx = sumx2 - sumx^2/n",toString(ssx))
-        
-        ssy = sumy2 - sumy^2/n
-        df[nrow(df) + 1,] = c("ssy = sumy2 - sumy^2/n",toString(ssy))
+        ssy = ysum2 - ysum^2/n
+        df[nrow(df) + 1,] = c("ssy=ysum2 - ysum^2/n",toString(ssy))
         
         # slope is b1 and intercept is b0
         b1 = ssxy/ssx
-        df[nrow(df) + 1,] = c("b1 = ssxy/ssx",toString(b1))
+        df[nrow(df) + 1,] = c("b1=ssxy/ssx",toString(b1))
         
-        b0 = meany - (b1 * meanx)
-        df[nrow(df) + 1,] = c("b0 = meany - (b1 * meanx)",toString(b0))
+        b0 = ymean - (b1 * xmean)
+        df[nrow(df) + 1,] = c("b0=ymean - (b1 * xmean)",toString(b0))
         
-        mse = mean((y - b0 * x) ^2)
-        df[nrow(df) + 1,] = c("mse = mean((y - b0 * x) ^2)",toString(mse))
+        # statistics
+        df[nrow(df) + 1,] = c("Basic Statistics","==========")
+        
+        xvar = sum((x - mean(x))^2)/(n-1)
+        df[nrow(df) + 1,] = c("var(x)=sum((x - mean(x))^2)/(n-1)",toString(xvar))
+        
+        yvar = sum((y - mean(y))^2)/(n-1)
+        df[nrow(df) + 1,] = c("var(y)=sum((y - mean(y))^2)/(n-1)",toString(yvar))
+        
+        xsd = sqrt(xvar) # sd(x)
+        df[nrow(df) + 1,] = c("sd(x)=sqrt(xvar)",toString(xsd))
+        
+        ysd = sqrt(yvar) # sd(y)
+        df[nrow(df) + 1,] = c("sd(y)=sqrt(yvar)",toString(ysd))
+        
+        xmse = mean((x - xmean)^2)
+        df[nrow(df) + 1,] = c("xmse=mean((x - meanx)^2)",toString(xmse))
+        
+        ymse = mean((y - ymean)^2)
+        df[nrow(df) + 1,] = c("ymse=mean((y - meany)^2)",toString(ymse))
         
         lse = sum((y - (b0 + b1*x))^2)
-        df[nrow(df) + 1,] = c("lse = sum((y - (b0 + b1*x))^2)",toString(lse))
+        df[nrow(df) + 1,] = c("lse=sum((y - (b0 + b1*x))^2)",toString(lse))
         
         # significance of regression model, r is the normalized, r is same as corXY
         r = ssxy / sqrt(ssx * ssy)
-        df[nrow(df) + 1,] = c("r = ssxy / sqrt(ssx * ssy)",toString(r))
+        df[nrow(df) + 1,] = c("r=ssxy / sqrt(ssx * ssy)",toString(r))
         # linear determination
         r2 = r^2
-        df[nrow(df) + 1,] = c("r2 = r^2",toString(r2))
+        df[nrow(df) + 1,] = c("r2=r^2",toString(r2))
         
         tStat = (r-0)/ sqrt((1-r2)/(n-2))
         df[nrow(df) + 1,] = c("t statistic=(r-0)/ sqrt((1-r2)/(n-2))",toString(tStat))
         
+        df[nrow(df) + 1,] = c("Actual Values from first x and y","==========")
         sampleXActual = tidyCars[1,xcol]
         sampleYActual = tidyCars[1,ycol]
         sampleYEstimated = b0 - (b1 * sampleXActual)
@@ -114,8 +128,8 @@ shinyServer(function(input, output, session) {
         xyData = getXYData()
         statsData = getStatsData()
         
-        b0 = as.numeric(statsData[20,2])
-        b1 = as.numeric(statsData[19,2])
+        b0 = as.numeric(statsData[19,2])
+        b1 = as.numeric(statsData[18,2])
         
         xLabel = input$xcol
         yLabel = input$ycol
