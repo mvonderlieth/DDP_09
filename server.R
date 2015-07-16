@@ -1,11 +1,19 @@
 # https://github.com/rstudio/shiny-examples/tree/master/050-kmeans-example
 library(dplyr, warn.conflicts = F)
 library(ggplot2, warn.conflicts = F)
+library(Cairo, warn.conflicts = F)
 
-tidyCars = mtcars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
-row.names(tidyCars) = row.names(mtcars)
+tidyCars = mtcars %>% add_rownames()
+tidyCars = tidyCars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
 
 shinyServer(function(input, output, session) {
+    output$help <- renderUI({
+        ht = paste("Select the inputs below to change what is displayed in the plot and the Formulas and Values Table.",
+                   "That table develops the slope and intecept",
+                   "They should match the corresponding values in the summary output of the fit method")
+        withMathJax(helpText(ht))
+    })
+    
     # return sorted xy data based on user input
     getCarData <- reactive({
         predictor = input$predictor
@@ -22,70 +30,90 @@ shinyServer(function(input, output, session) {
         x = carData[,predictor]
         y = carData[,response]
         
-        df = data.frame(var = character(0), val = character(0), stringsAsFactors = F)
-        df[nrow(df) + 1,] = c("x",toString(x))
-        df[nrow(df) + 1,] = c("y",toString(y))
+        df = data.frame(formula = character(0), value = character(0), stringsAsFactors = F)
+        form = "\\(x\\)"
+        df[nrow(df) + 1,] = c(form,toString(x))
+        form = "\\(y\\)"
+        df[nrow(df) + 1,] = c(form,toString(y))
         
         # compute sums
         df[nrow(df) + 1,] = c("Computed values","=========")
         n = length(x)
-        df[nrow(df) + 1,] = c("n",toString(n))
+        form = "\\(n\\)"
+        df[nrow(df) + 1,] = c(form,toString(n))
         
         xsum = sum(x)
-        df[nrow(df) + 1,] = c("xsum=sum(x)",toString(xsum))
+        form = "xsum=\\(sum(x)\\)"
+        df[nrow(df) + 1,] = c(form,toString(xsum))
         
         ysum = sum(y)
-        df[nrow(df) + 1,] = c("ysum=sum(y)",toString(ysum))
+        form = "ysum=\\(sum(y)\\)"
+        df[nrow(df) + 1,] = c(form,toString(ysum))
         
         x2 = (x^2)
-        df[nrow(df) + 1,] = c("x2=x^2",toString(x2))
+        form = "x2=$$x^2$$"
+        df[nrow(df) + 1,] = c(form,toString(x2))
         
         y2 = (y^2)
-        df[nrow(df) + 1,] = c("y2=y^2",toString(y2))
+        form = "y2=$$y^2$$"
+        df[nrow(df) + 1,] = c(form,toString(y2))
         
         xsum2 = sum(x2)
+        form="$$"
         df[nrow(df) + 1,] = c("xsum2=sum(x2)",toString(xsum2))
         
         ysum2 = sum(y2)
+        form="$$"
         df[nrow(df) + 1,] = c("ysum2=m2=sum(y2)",toString(ysum2))
         
         xy = (x*y)
+        form="$$"
         df[nrow(df) + 1,] = c("xy=x*y",toString(xy))
         
         xysum = sum(xy)
+        form="$$"
         df[nrow(df) + 1,] = c("xysum=sum(xy)",toString(xysum))
         
         # compute model
         xmean = xsum/n
+        form="$$"
         df[nrow(df) + 1,] = c("xmean=xsum/n",toString(xmean))
         
         ymean = ysum/n
+        form="$$"
         df[nrow(df) + 1,] = c("ymean=ysum/n",toString(ymean))
         
         ssxy = xysum - (xsum*ysum)/n
+        form="$$"
         df[nrow(df) + 1,] = c("ssxy=xysum - (xsum*ysum)/n",toString(ssxy))
         
         ssx = xsum2 - xsum^2/n
+        form="$$"
         df[nrow(df) + 1,] = c("ssx=xsum2 - xsum^2/n",toString(ssx))
         
         ssy = ysum2 - ysum^2/n
+        form="$$"
         df[nrow(df) + 1,] = c("ssy=ysum2 - ysum^2/n",toString(ssy))
         
         # slope is b1 and intercept is b0
         b1 = ssxy/ssx
-        df[nrow(df) + 1,] = c("b1=ssxy/ssx",toString(b1))
+        form="b1=$$ssxy/ssx$$"
+        df[nrow(df) + 1,] = c(form,toString(b1))
         
         b0 = ymean - (b1 * xmean)
-        df[nrow(df) + 1,] = c("b0=ymean - (b1 * xmean)",toString(b0))
+        form = "b0=$$ymean - (b1 * xmean)$$"
+        df[nrow(df) + 1,] = c(form,toString(b0))
         
         # statistics
         df[nrow(df) + 1,] = c("Basic Statistics","==========")
         
         xvar = sum((x - mean(x))^2)/(n-1)
-        df[nrow(df) + 1,] = c("var(x)=sum((x - mean(x))^2)/(n-1)",toString(xvar))
+        form = "xvar=$$sum((x - mean(x))^2)/(n-1)$$"
+        df[nrow(df) + 1,] = c(form,toString(xvar))
         
         yvar = sum((y - mean(y))^2)/(n-1)
-        df[nrow(df) + 1,] = c("var(y)=sum((y - mean(y))^2)/(n-1)",toString(yvar))
+        form = "yvar=$$sum((y - mean(y))^2)/(n-1)$$"
+        df[nrow(df) + 1,] = c(form,toString(yvar))
         
         xsd = sqrt(xvar) # sd(x)
         df[nrow(df) + 1,] = c("sd(x)=sqrt(xvar)",toString(xsd))
@@ -113,8 +141,8 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("t statistic=(r-0)/ sqrt((1-r2)/(n-2))",toString(tStat))
         
         df[nrow(df) + 1,] = c("Actual Values from first x and y","==========")
-        sampleXActual = tidyCars[1,predictor]
-        sampleYActual = tidyCars[1,response]
+        sampleXActual = carData[1,predictor]
+        sampleYActual = carData[1,response]
         sampleYEstimated = b0 - (b1 * sampleXActual)
         df[nrow(df) + 1,] = c("actual x row 1",toString(sampleXActual))
         df[nrow(df) + 1,] = c("actual y row 1",toString(sampleYActual))
@@ -136,6 +164,7 @@ shinyServer(function(input, output, session) {
         carData = getCarData()
         predictor = input$predictor
         response = input$response
+        fitMethod = input$fitMethod
 
         statsData = getStatsData()
         
@@ -144,16 +173,20 @@ shinyServer(function(input, output, session) {
         
         xLabel = predictor
         yLabel = response
-        titleLabel = paste(yLabel," as predicted by ", xLabel)
+        titleLabel = paste("The Red line is based on B0 and B1 as derived in the formulas.\n",
+                        "The Blue line is the line as plotted by the fit method.\n",
+                        "Drag the mouse over some points to find out which cars the are!")
         
         g = eval(substitute(ggplot(carData, aes(y=var1,x=var2)),list(var1 = as.name(response),var2 = as.name(predictor))))
+        gfm = eval(substitute(geom_smooth(method=var1, formula=y~x),list(var1 = as.name(fitMethod))))
+
         g = g  + scale_size(range = c(2, 5), guide = "none" )
         g = g + geom_abline(intercept = b0, slope = b1, colour = "red")
-        g = g + geom_smooth(method="lm", formula=y~x)
+        g = g + gfm
         g = g + geom_point()
         g = g + labs(list(x=xLabel,y=yLabel, title=titleLabel))
         g = g + theme_bw()
-        print(g)
+        g
     })
     
     output$summary <- renderPrint({
@@ -161,7 +194,17 @@ shinyServer(function(input, output, session) {
         summary(fit)
     })
     
-    output$view <- renderTable({
+#     output$click_point <- renderPrint({
+#         carData = getCarData()
+#         nearPoints(carData, input$plot_click, addDist = TRUE)
+#     })
+#     
+    output$brush_points <- renderPrint({
+        carData = getCarData()
+        brushedPoints(carData, input$plot_brush)
+    })
+    
+    output$formulas <- renderTable({
         getStatsData()
     })
 })

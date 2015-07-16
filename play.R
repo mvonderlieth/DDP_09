@@ -1,10 +1,8 @@
 library(dplyr, warn.conflicts = F)
 library(ggplot2, warn.conflicts = F)
 
-tidyCars = mtcars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
-#        selectInput('xcol', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
-#        selectInput('ycol', 'Response', c("qsec","mpg"),selected="qsec")
-row.names(tidyCars) = row.names(mtcars)
+tidyCars = mtcars %>% add_rownames()
+tidyCars = tidyCars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
 
 xcol = "wt"
 ycol = "qsec"

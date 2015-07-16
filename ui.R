@@ -4,14 +4,16 @@ shinyUI(
         # page title and main title
         title = "Statistics for a Linear Model and MTCARS",
         titlePanel("Statistics for a Linear Model and MTCARS"),
+        # need withMathJax here and at least on uiOutput() to get mathjax to show in formula table!?
+        withMathJax(),
 
         sidebarLayout(
             sidebarPanel(
-                helpText("Create demographic maps with information from the 2010 US Census.")
+                uiOutput('help')
             ),
             
             mainPanel(
-                plotOutput('plot')
+                plotOutput('plot',click = "plot_click",brush = brushOpts(id = "plot_brush"))
             )
         ),
         
@@ -19,13 +21,16 @@ shinyUI(
         
         fluidRow(
             column(3,
-                   h4("Choose model predictor and response")
+                   h4("Choose the model Predictor, Response and Fit Method")
             ),
             column(3,
                    selectInput('predictor', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
             ),
             column(3,
                    selectInput('response', 'Response', c("qsec","mpg"),selected="qsec")
+            ),
+            column(3,
+                   selectInput('fitMethod', 'Fit Method', c("lm","loess"),selected="lm")
             )
         ),
         
@@ -34,10 +39,13 @@ shinyUI(
         fluidRow(
             column(7,
                    h5("Formulas and Values"),
-                   tableOutput("view")
+                   tableOutput("formulas")
             ),
             column(5,
-                   h5("Summary"),
+                   h5("Selected Cars"),
+                   # verbatimTextOutput('click_point'),
+                   verbatimTextOutput('brush_points'),
+                   h5("Summary of lm(y~x)"),
                    verbatimTextOutput('summary')
             )
         )
