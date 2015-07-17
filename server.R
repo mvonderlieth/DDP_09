@@ -17,8 +17,9 @@ shinyServer(function(input, output, session) {
     output$help <- renderUI({
         # mathjax not really needed here
         ht = paste("Select the inputs below to change what is displayed in the plot and the Formulas and Values Table.",
-                   "That table develops the slope and intecept",
-                   "They should match the corresponding values in the summary output of the fit method")
+                   "That table develops the slope and intecept by evaluating each formula in turn.",
+                   "They b0 should match the intercept in the fit summary output, and the b1 value should match the x value.",
+                   "Also additional helpful statistics are generated, including the t statistic which should also match the x t value in the summary.")
         withMathJax(helpText(ht))
     })
     
@@ -40,121 +41,129 @@ shinyServer(function(input, output, session) {
         
         df = data.frame(formula = character(0), value = character(0), stringsAsFactors = F)
         form = "\\(x\\)"
-        df[nrow(df) + 1,] = c(form,toString(x))
+        df[nrow(df) + 1,] = c(form,toString(round(x,2)))
         form = "\\(y\\)"
-        df[nrow(df) + 1,] = c(form,toString(y))
+        df[nrow(df) + 1,] = c(form,toString(round(y,2)))
         
         # compute sums
         df[nrow(df) + 1,] = c("Computed values","=========")
         n = length(x)
         form = "\\(n\\)"
-        df[nrow(df) + 1,] = c(form,toString(n))
+        df[nrow(df) + 1,] = c(form,toString(round(n,2)))
         
         xsum = sum(x)
         form = "xsum=\\(sum(x)\\)"
-        df[nrow(df) + 1,] = c(form,toString(xsum))
+        df[nrow(df) + 1,] = c(form,toString(round(xsum,2)))
         
         ysum = sum(y)
         form = "ysum=\\(sum(y)\\)"
-        df[nrow(df) + 1,] = c(form,toString(ysum))
+        df[nrow(df) + 1,] = c(form,toString(round(ysum,2)))
         
         x2 = (x^2)
         form = "x2=$$x^2$$"
-        df[nrow(df) + 1,] = c(form,toString(x2))
+        df[nrow(df) + 1,] = c(form,toString(round(x2,2)))
         
         y2 = (y^2)
         form = "y2=$$y^2$$"
-        df[nrow(df) + 1,] = c(form,toString(y2))
+        df[nrow(df) + 1,] = c(form,toString(round(y2,2)))
         
         xsum2 = sum(x2)
-        form="$$"
-        df[nrow(df) + 1,] = c("xsum2=sum(x2)",toString(xsum2))
+        form="$$xsum2 = sum(x2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xsum2,2)))
         
         ysum2 = sum(y2)
-        form="$$"
-        df[nrow(df) + 1,] = c("ysum2=m2=sum(y2)",toString(ysum2))
+        form="$$ysum2 = sum(y2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ysum2,2)))
         
         xy = (x*y)
-        form="$$"
-        df[nrow(df) + 1,] = c("xy=x*y",toString(xy))
+        form="$$xy = (x*y)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xy,2)))
         
         xysum = sum(xy)
-        form="$$"
-        df[nrow(df) + 1,] = c("xysum=sum(xy)",toString(xysum))
+        form="$$xysum = sum(xy)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xysum,2)))
         
         # compute model
         xmean = xsum/n
-        form="$$"
-        df[nrow(df) + 1,] = c("xmean=xsum/n",toString(xmean))
+        form="$$xmean = xsum/n$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xmean,2)))
         
         ymean = ysum/n
-        form="$$"
-        df[nrow(df) + 1,] = c("ymean=ysum/n",toString(ymean))
+        form="$$ymean = ysum/n$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ymean,2)))
         
         ssxy = xysum - (xsum*ysum)/n
-        form="$$"
-        df[nrow(df) + 1,] = c("ssxy=xysum - (xsum*ysum)/n",toString(ssxy))
+        form="$$ssxy = xysum - (xsum*ysum)/n$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ssxy,2)))
         
         ssx = xsum2 - xsum^2/n
-        form="$$"
-        df[nrow(df) + 1,] = c("ssx=xsum2 - xsum^2/n",toString(ssx))
+        form="$$ssx = xsum2 - xsum^2/n$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ssx,2)))
         
         ssy = ysum2 - ysum^2/n
-        form="$$"
-        df[nrow(df) + 1,] = c("ssy=ysum2 - ysum^2/n",toString(ssy))
+        form="$$ssy = ysum2 - ysum^2/n$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ssy,2)))
         
         # slope is b1 and intercept is b0
         b1 = ssxy/ssx
-        form="b1=$$ssxy/ssx$$"
-        df[nrow(df) + 1,] = c(form,toString(b1))
+        form="$$b1=ssxy/ssx$$"
+        df[nrow(df) + 1,] = c(form,toString(round(b1,4)))
         
         b0 = ymean - (b1 * xmean)
-        form = "b0=$$ymean - (b1 * xmean)$$"
-        df[nrow(df) + 1,] = c(form,toString(b0))
+        form = "$$b0=ymean - (b1 * xmean)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(b0,4)))
         
         # statistics
         df[nrow(df) + 1,] = c("Basic Statistics","==========")
         
-        xvar = sum((x - mean(x))^2)/(n-1)
-        form = "xvar=$$sum((x - mean(x))^2)/(n-1)$$"
-        df[nrow(df) + 1,] = c(form,toString(xvar))
+        xvar = sum((x - xmean)^2)/(n-1)
+        form = "$$xvar=sum((x - xmean)^2)/(n-1)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xvar,2)))
         
-        yvar = sum((y - mean(y))^2)/(n-1)
-        form = "yvar=$$sum((y - mean(y))^2)/(n-1)$$"
-        df[nrow(df) + 1,] = c(form,toString(yvar))
+        yvar = sum((y - ymean)^2)/(n-1)
+        form = "$$yvar=sum((y - ymean)^2)/(n-1)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(yvar,2)))
         
         xsd = sqrt(xvar) # sd(x)
-        df[nrow(df) + 1,] = c("sd(x)=sqrt(xvar)",toString(xsd))
+        form = "$$xsd = sqrt(xvar)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xsd,2)))
         
         ysd = sqrt(yvar) # sd(y)
-        df[nrow(df) + 1,] = c("sd(y)=sqrt(yvar)",toString(ysd))
+        form = "$$ysd = sqrt(yvar)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ysd,2)))
         
         xmse = mean((x - xmean)^2)
-        df[nrow(df) + 1,] = c("xmse=mean((x - meanx)^2)",toString(xmse))
+        form = "$$xmse = mean((x - xmean)^2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(xmse,2)))
         
         ymse = mean((y - ymean)^2)
-        df[nrow(df) + 1,] = c("ymse=mean((y - meany)^2)",toString(ymse))
+        form = "$$ymse = mean((y - ymean)^2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(ymse,2)))
         
         lse = sum((y - (b0 + b1*x))^2)
-        df[nrow(df) + 1,] = c("lse=sum((y - (b0 + b1*x))^2)",toString(lse))
+        form = "$$lse = sum((y - (b0 + b1*x))^2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(lse,2)))
         
         # significance of regression model, r is the normalized, r is same as corXY
         r = ssxy / sqrt(ssx * ssy)
-        df[nrow(df) + 1,] = c("r=ssxy / sqrt(ssx * ssy)",toString(r))
+        form = "$$r = ssxy / sqrt(ssx * ssy)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(r,2)))
         # linear determination
         r2 = r^2
-        df[nrow(df) + 1,] = c("r2=r^2",toString(r2))
+        form = "$$r2 = r^2$$"
+        df[nrow(df) + 1,] = c(form,toString(round(r2,2)))
         
         tStat = (r-0)/ sqrt((1-r2)/(n-2))
-        df[nrow(df) + 1,] = c("t statistic=(r-0)/ sqrt((1-r2)/(n-2))",toString(tStat))
+        form = "$$tStat = (r-0)/ sqrt((1-r2)/(n-2))$$"
+        df[nrow(df) + 1,] = c(form,toString(round(tStat,3)))
         
         df[nrow(df) + 1,] = c("Actual Values from first x and y","==========")
         sampleXActual = carData[1,predictor]
         sampleYActual = carData[1,response]
         sampleYEstimated = b0 - (b1 * sampleXActual)
-        df[nrow(df) + 1,] = c("actual x row 1",toString(sampleXActual))
-        df[nrow(df) + 1,] = c("actual y row 1",toString(sampleYActual))
-        df[nrow(df) + 1,] = c("estimated y=b0 - (b1 * actual x)",toString(sampleYEstimated))
+        df[nrow(df) + 1,] = c("actual x row 1",toString(round(sampleXActual,2)))
+        df[nrow(df) + 1,] = c("actual y row 1",toString(round(sampleYActual,2)))
+        df[nrow(df) + 1,] = c("estimated y=b0 - (b1 * actual x)",toString(round(sampleYEstimated,2)))
         df
     })
     
@@ -181,9 +190,9 @@ shinyServer(function(input, output, session) {
         
         xLabel = predictor
         yLabel = response
-        titleLabel = paste("The Red line is based on B0 and B1 as derived in the formulas.\n",
-                        "The Blue line is the line as plotted by the fit method.\n",
-                        "Drag the mouse over some points to find out which cars the are!")
+#         titleLabel = paste("The Red line is based on B0 and B1 as derived in the formulas.\n",
+#                         "The Blue line is the line as plotted by the fit method.\n",
+#                         "Drag the mouse over some points to find out which cars the are!")
         
         g = eval(substitute(ggplot(carData, aes(y=var1,x=var2)),list(var1 = as.name(response),var2 = as.name(predictor))))
         gfm = eval(substitute(geom_smooth(method=var1, formula=y~x),list(var1 = as.name(fitMethod))))
@@ -192,7 +201,8 @@ shinyServer(function(input, output, session) {
         g = g + geom_abline(intercept = b0, slope = b1, colour = "red")
         g = g + gfm
         g = g + geom_point()
-        g = g + labs(list(x=xLabel,y=yLabel, title=titleLabel))
+#         g = g + labs(list(x=xLabel,y=yLabel, title=titleLabel))
+        g = g + labs(list(x=xLabel,y=yLabel))
         g = g + theme_bw()
         g
     })
