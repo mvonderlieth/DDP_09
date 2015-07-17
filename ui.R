@@ -39,7 +39,7 @@ shinyUI(
         fluidRow(
             column(7,
                    h5("Formulas and Values"),
-                   tableOutput("formulas")
+                   uiOutput("formulas")
             ),
             column(5,
                    h5("Selected Cars"),

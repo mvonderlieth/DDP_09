@@ -1,13 +1,21 @@
-# https://github.com/rstudio/shiny-examples/tree/master/050-kmeans-example
+# See here for how most of this works: http://shiny.rstudio.com/gallery/
+# Note to mathjax to work dynamically for the table I had to hack shiny,
+#   such as taking the outut of renderTable(df) and hacking it in here.
+
 library(dplyr, warn.conflicts = F)
 library(ggplot2, warn.conflicts = F)
-library(Cairo, warn.conflicts = F)
+# library(Cairo, warn.conflicts = F)
+library(xtable)
+library(htmltools)
 
 tidyCars = mtcars %>% add_rownames()
 tidyCars = tidyCars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
+# used below by formulas section
+classNames <- "data table table-bordered table-condensed"
 
 shinyServer(function(input, output, session) {
     output$help <- renderUI({
+        # mathjax not really needed here
         ht = paste("Select the inputs below to change what is displayed in the plot and the Formulas and Values Table.",
                    "That table develops the slope and intecept",
                    "They should match the corresponding values in the summary output of the fit method")
@@ -204,7 +212,18 @@ shinyServer(function(input, output, session) {
         brushedPoints(carData, input$plot_brush)
     })
     
-    output$formulas <- renderTable({
-        getStatsData()
+    output$formulas <- renderUI({
+        df = getStatsData()
+        # totally hacked from renderTable(), took the paste(...) stuff and passed it to HTML and passed it to withMathJax!!
+        withMathJax(
+            HTML(
+                paste(
+                    capture.output(
+                        print(xtable(df), type = "html",html.table.attributes = paste("class=\"",htmlEscape(classNames, TRUE), "\"", sep = ""))
+                    ),
+                collapse = "\n"
+                )
+            )
+        )
     })
 })
