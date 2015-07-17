@@ -48,32 +48,32 @@ shinyServer(function(input, output, session) {
         # compute sums
         df[nrow(df) + 1,] = c("Computed values","=========")
         n = length(x)
-        form = "\\(n\\)"
+        form = "$$n$$"
         df[nrow(df) + 1,] = c(form,toString(round(n,2)))
         
         xsum = sum(x)
-        form = "xsum=\\(sum(x)\\)"
+        form = "$$xsum=sum(x)$$"
         df[nrow(df) + 1,] = c(form,toString(round(xsum,2)))
         
         ysum = sum(y)
-        form = "ysum=\\(sum(y)\\)"
+        form = "$$ysum=sum(y)$$"
         df[nrow(df) + 1,] = c(form,toString(round(ysum,2)))
         
         x2 = (x^2)
-        form = "x2=$$x^2$$"
+        form = "$$x2=x^2$$"
         df[nrow(df) + 1,] = c(form,toString(round(x2,2)))
         
         y2 = (y^2)
-        form = "y2=$$y^2$$"
+        form = "$$y2=y^2$$"
         df[nrow(df) + 1,] = c(form,toString(round(y2,2)))
         
-        xsum2 = sum(x2)
-        form="$$xsum2 = sum(x2)$$"
-        df[nrow(df) + 1,] = c(form,toString(round(xsum2,2)))
+        x2sum = sum(x2)
+        form="$$x2sum = sum(x2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(x2sum,2)))
         
-        ysum2 = sum(y2)
-        form="$$ysum2 = sum(y2)$$"
-        df[nrow(df) + 1,] = c(form,toString(round(ysum2,2)))
+        y2sum = sum(y2)
+        form="$$y2sum = sum(y2)$$"
+        df[nrow(df) + 1,] = c(form,toString(round(y2sum,2)))
         
         xy = (x*y)
         form="$$xy = (x*y)$$"
@@ -96,12 +96,12 @@ shinyServer(function(input, output, session) {
         form="$$ssxy = xysum - (xsum*ysum)/n$$"
         df[nrow(df) + 1,] = c(form,toString(round(ssxy,2)))
         
-        ssx = xsum2 - xsum^2/n
-        form="$$ssx = xsum2 - xsum^2/n$$"
+        ssx = x2sum - xsum^2/n
+        form="$$ssx = x2sum - xsum^2/n$$"
         df[nrow(df) + 1,] = c(form,toString(round(ssx,2)))
         
-        ssy = ysum2 - ysum^2/n
-        form="$$ssy = ysum2 - ysum^2/n$$"
+        ssy = y2sum - ysum^2/n
+        form="$$ssy = y2sum - ysum^2/n$$"
         df[nrow(df) + 1,] = c(form,toString(round(ssy,2)))
         
         # slope is b1 and intercept is b0
