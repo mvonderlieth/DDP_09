@@ -16,3 +16,4 @@ vignettes/*.pdf
 .Rdata
 *.RProj
 
+rsconnect/
