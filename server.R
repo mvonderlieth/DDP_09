@@ -172,10 +172,10 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("","$$Actual\\;Values\\;from\\;first\\;x\\;and\\;y$$","")
         sampleXActual = carData[1,predictor]
         sampleYActual = carData[1,response]
-        sampleYEstimated = b0 - (b1 * sampleXActual)
+        sampleYEstimated = b0 + (b1 * sampleXActual)
         df[nrow(df) + 1,] = c("actual x row 1","sampleXActual = carData[1,predictor]",toString(round(sampleXActual,2)))
         df[nrow(df) + 1,] = c("actual y row 1","sampleYActual = carData[1,response]",toString(round(sampleYActual,2)))
-        df[nrow(df) + 1,] = c("estimated y=b0 - (b1 * actual x)","sampleYEstimated = b0 - (b1 * sampleXActual)",toString(round(sampleYEstimated,2)))
+        df[nrow(df) + 1,] = c("estimated y=b0 + (b1 * actual x)","sampleYEstimated = b0 - (b1 * sampleXActual)",toString(round(sampleYEstimated,2)))
         list(df,b0,b1)
     })
     
