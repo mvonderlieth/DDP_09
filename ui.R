@@ -8,7 +8,7 @@ ht3 = paste(
            "Then look at the Summary Output, and then scroll down the Formulas Table below it.",
            "The Formulas Table develops the slope and intecept by evaluating each formula in turn.",
            "The b0 should match the intercept in the fit summary output, and the b1 value should match the x value.",
-           "The table also generates additional helpful, including the t statistic which should also match the t value for x in the summary.")
+           "The table also shows additional helpful statistics, including the t statistic which should also match the t value for x in the summary.")
 
 shinyUI(
     fluidPage(
@@ -55,7 +55,7 @@ shinyUI(
                    verbatimTextOutput('summary')
             ),
             column(6,
-                   h4("Selected Cars"),
+                   h4("Bonus: Selected Cars"),
                    helpText("Click and drag in plot to see which points go with which cars"),
                    # verbatimTextOutput('click_point'),
                    verbatimTextOutput('brush_points')            
