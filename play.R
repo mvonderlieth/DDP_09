@@ -2,7 +2,8 @@ library(dplyr, warn.conflicts = F)
 library(ggplot2, warn.conflicts = F)
 
 tidyCars = mtcars %>% add_rownames()
-tidyCars = tidyCars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
+# tidyCars = tidyCars %>% mutate(am=as.factor(am),cyl=as.factor(cyl),vs=as.factor(vs),gear=as.factor(gear),carb=as.factor(carb))
+tidyCars = tidyCars %>% select(rowname,mpg,disp,hp,drat,wt,qsec)
 
 xcol = "wt"
 ycol = "qsec"

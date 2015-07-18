@@ -1,15 +1,26 @@
+# mvonderlieth June 2015
+
+ht1 = "The mtcars is a very popular dataset often used in R.  Here we will use it to decompose the formulas that constitute the slope and intercept values of a linear model."
+ht2 = paste(
+           "First select the inputs below to change what is displayed in the Plot, the Summary Output, and the Formulas Table (below the summary)."
+           )
+ht3 = paste(
+           "Then look at the Summary Output, and then scroll down the Formulas Table below it.",
+           "The Formulas Table develops the slope and intecept by evaluating each formula in turn.",
+           "The b0 should match the intercept in the fit summary output, and the b1 value should match the x value.",
+           "The table also generates additional helpful, including the t statistic which should also match the t value for x in the summary.")
 
 shinyUI(
     fluidPage(
         # page title and main title
         title = "Statistics for a Linear Model and MTCARS",
         titlePanel("Statistics for a Linear Model and MTCARS"),
-        # need withMathJax here and at least on uiOutput() to get mathjax to show in formula table!?
-        withMathJax(),
-
+        
         sidebarLayout(
             sidebarPanel(
-                uiOutput('help')
+                helpText(ht1),
+                helpText(ht2),
+                helpText(ht3)
             ),
             
             mainPanel(
@@ -22,7 +33,7 @@ shinyUI(
         
         fluidRow(
             column(3,
-                   h4("Choose the model Predictor, Response and Fit Method")
+                   h5("Choose the model Predictor, Response and Fit Method")
             ),
             column(3,
                    selectInput('predictor', 'Predictor', c("wt","disp","hp","drat"),selected="wt")
@@ -36,21 +47,28 @@ shinyUI(
         ),
         
         hr(),
-        
+
         fluidRow(
-            column(7,
-                   h5("Formulas and Values"),
-                   helpText("All numbers rounded to 2 places, except b0, b1 and t-stat so they match the fit summary values."),
-                   uiOutput("formulas")
-            ),
-            column(5,
-                   h5("Selected Cars"),
-                   helpText("Click and drag in plot to see which points go with which cars"),
-                   # verbatimTextOutput('click_point'),
-                   verbatimTextOutput('brush_points'),
-                   h5("Summary of lm(y~x)"),
+            column(6,
+                   h4("Summary Output"),
                    helpText("Not showing summary of loess fit as I don't calculate those values, it's just an option so you can see the red line better!"),
                    verbatimTextOutput('summary')
+            ),
+            column(6,
+                   h4("Selected Cars"),
+                   helpText("Click and drag in plot to see which points go with which cars"),
+                   # verbatimTextOutput('click_point'),
+                   verbatimTextOutput('brush_points')            
+            )
+        ),
+
+        hr(),
+        
+        fluidRow(
+            column(12,
+                   h4("Formulas Table"),
+                   helpText("Here we develop and decompose the model formulas"),
+                   uiOutput("formulas")
             )
         )
     )
