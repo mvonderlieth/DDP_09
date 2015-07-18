@@ -16,6 +16,5 @@ vignettes/*.pdf
 .Rdata
 *.RProj
 
-**/rconnect/
-
 *.dcf
+play.R
