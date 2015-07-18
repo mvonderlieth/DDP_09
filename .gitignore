@@ -16,4 +16,6 @@ vignettes/*.pdf
 .Rdata
 *.RProj
 
-rconnect/
+**/rconnect/
+
+*.dcf
