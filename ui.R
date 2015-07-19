@@ -56,9 +56,10 @@ shinyUI(
             ),
             column(6,
                    h4("Bonus: Selected Cars"),
-                   helpText("Click and drag in plot to see which points go with which cars"),
+                   helpText("Click and drag in plot to see which points go with which cars.  If you select the first point it should match the values in the table below."),
                    # verbatimTextOutput('click_point'),
-                   verbatimTextOutput('brush_points')            
+                   verbatimTextOutput('brush_points'),
+                   tableOutput("actuals")
             )
         ),
 

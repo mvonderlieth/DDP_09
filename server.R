@@ -62,11 +62,11 @@ shinyServer(function(input, output, session) {
 
         # compute sums
         xsum = sum(x)
-        form = "$$xsum=sum(x)$$"
+        form = "$$xsum=\\sum(x)$$"
         df[nrow(df) + 1,] = c(form,"xsum = sum(x)",toString(round(xsum,2)))
         
         ysum = sum(y)
-        form = "$$ysum=sum(y)$$"
+        form = "$$ysum=\\sum(y)$$"
         df[nrow(df) + 1,] = c(form,"ysum = sum(y)",toString(round(ysum,2)))
         
         x2 = x^2
@@ -78,11 +78,11 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c(form,"y2 = y^2",toString(round(y2,2)))
         
         x2sum = sum(x2)
-        form="$$x2sum = sum(x2)$$"
+        form="$$x2sum = \\sum(x2)$$"
         df[nrow(df) + 1,] = c(form,"x2sum = sum(x2)",toString(round(x2sum,2)))
         
         y2sum = sum(y2)
-        form="$$y2sum = sum(y2)$$"
+        form="$$y2sum = \\sum(y2)$$"
         df[nrow(df) + 1,] = c(form,"y2sum = sum(y2)",toString(round(y2sum,2)))
         
         xy = x*y
@@ -90,7 +90,7 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c(form,"xy = x*y",toString(round(xy,2)))
         
         xysum = sum(xy)
-        form="$$xysum = sum(xy)$$"
+        form="$$xysum = \\sum(xy)$$"
         df[nrow(df) + 1,] = c(form,"xysum = sum(xy)",toString(round(xysum,2)))
         
         # compute model
@@ -123,14 +123,14 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c("","$$Basic\\;Statistics$$","")
         ssy = y2sum - ysum^2/n
         form="$$ssy = y2sum - \\frac{ysum^2}{n}$$"
-        df[nrow(df) + 1,] = c(form,"",toString(round(ssy,2)))
+        df[nrow(df) + 1,] = c(form,"ssy = y2sum - ysum^2/n",toString(round(ssy,2)))
         
         xvar = sum((x - xmean)^2)/(n-1)
-        form = "$$xvar = \\frac{sum((x - xmean)^2)}{(n-1)}$$"
-        df[nrow(df) + 1,] = c(form,"ssy = y2sum - ysum^2/n",toString(round(xvar,4)))
+        form = "$$xvar = \\frac{\\sum(x - xmean)^2}{(n-1)}$$"
+        df[nrow(df) + 1,] = c(form,"xvar = sum((x - xmean)^2)/(n-1)",toString(round(xvar,4)))
         
         yvar = sum((y - ymean)^2)/(n-1)
-        form = "$$yvar = \\frac{sum((y - ymean)^2)}{(n-1)}$$"
+        form = "$$yvar = \\frac{\\sum(y - ymean)^2}{(n-1)}$$"
         df[nrow(df) + 1,] = c(form,"yvar = sum((y - ymean)^2)/(n-1)",toString(round(yvar,4)))
         
         xsd = sqrt(xvar) # sd(x)
@@ -150,7 +150,7 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c(form,"xmse = mean((x - xmean)^2)",toString(round(ymse,4)))
         
         lse = sum((y - (b0 + b1*x))^2)
-        form = "$$lse = sum((y - (b0 + b1*x))^2)$$"
+        form = "$$lse = \\sum((y - (b0 + b1*x))^2)$$"
         df[nrow(df) + 1,] = c(form,"lse = sum((y - (b0 + b1*x))^2)",toString(round(lse,4)))
         
         # significance of regression model, r is normalized, r is same as corXY
@@ -162,20 +162,24 @@ shinyServer(function(input, output, session) {
         form = "$$r2 = r^2$$"
         df[nrow(df) + 1,] = c(form,"r2 = r^2",toString(round(r2,4)))
         
-        # as per fit summary
-        # fitR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)
-        
         tStat = (r-0)/sqrt((1-r2)/(n-2))
         form = "$$tStat = \\frac{(r-0)}{\\sqrt{\\frac{1-r^2}{n-2}}}$$"
         df[nrow(df) + 1,] = c(form,"tStat = (r-0)/sqrt((1-r2)/(n-2))",toString(round(tStat,3)))
+        
+        # as per fit summary, Coefficient of determination
+        fit = getFit()
+        multR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)
+        form = "$$multR2 = 1 - \\frac{fit$residuals^2}{\\sum(y-ymean)}$$"
+        df[nrow(df) + 1,] = c(form,"multR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)",toString(round(multR2,5)))
         
         df[nrow(df) + 1,] = c("","$$Actual\\;Values\\;from\\;first\\;x\\;and\\;y$$","")
         sampleXActual = carData[1,predictor]
         sampleYActual = carData[1,response]
         sampleYEstimated = b0 + (b1 * sampleXActual)
-        df[nrow(df) + 1,] = c("actual x row 1","sampleXActual = carData[1,predictor]",toString(round(sampleXActual,2)))
-        df[nrow(df) + 1,] = c("actual y row 1","sampleYActual = carData[1,response]",toString(round(sampleYActual,2)))
-        df[nrow(df) + 1,] = c("estimated y=b0 + (b1 * actual x)","sampleYEstimated = b0 - (b1 * sampleXActual)",toString(round(sampleYEstimated,2)))
+        estimatedFormula = sprintf("%.3f - (%.3f * %.3f)",b0,b1,sampleXActual)
+        df[nrow(df) + 1,] = c(predictor,"carData[1,predictor]",toString(round(sampleXActual,2)))
+        df[nrow(df) + 1,] = c(response,"carData[1,response]",toString(round(sampleYActual,2)))
+        df[nrow(df) + 1,] = c("estimated y",estimatedFormula,toString(round(sampleYEstimated,2)))
         list(df,b0,b1)
     })
     
@@ -202,10 +206,7 @@ shinyServer(function(input, output, session) {
         
         xLabel = predictor
         yLabel = response
-#         titleLabel = paste("The Red line is based on B0 and B1 as derived in the formulas.\n",
-#                         "The Blue line is the line as plotted by the fit method.\n",
-#                         "Drag the mouse over some points to find out which cars the are!")
-        
+
         g = eval(substitute(ggplot(carData, aes(y=var1,x=var2)),list(var1 = as.name(response),var2 = as.name(predictor))))
         gfm = eval(substitute(geom_smooth(method=var1, formula=y~x),list(var1 = as.name(fitMethod))))
 
@@ -213,7 +214,6 @@ shinyServer(function(input, output, session) {
         g = g + geom_abline(intercept = b0, slope = b1, colour = "red")
         g = g + gfm
         g = g + geom_point()
-#         g = g + labs(list(x=xLabel,y=yLabel, title=titleLabel))
         g = g + labs(list(x=xLabel,y=yLabel))
         g = g + theme_bw()
         g
@@ -237,6 +237,7 @@ shinyServer(function(input, output, session) {
     output$formulas <- renderUI({
         statsDataList = getStatsData()
         df = data.frame(statsDataList[1])
+        df = df[1:32,]
         # totally hacked from renderTable(), took the paste(...) stuff and passed it to HTML and passed it to withMathJax!!
         withMathJax(
             HTML(
@@ -249,4 +250,17 @@ shinyServer(function(input, output, session) {
             )
         )
     })
+    
+    output$actuals <- renderTable({
+        statsDataList = getStatsData()
+        df = data.frame(statsDataList[1])
+        actualDf = df[34:36,]
+#         predictor = input$predictor
+#         response = input$response
+#         actualDf[1,1] = predictor
+#         actualDf[2,1] = response
+        
+        actualDf
+    })
+    
 })
