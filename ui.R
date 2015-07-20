@@ -1,6 +1,6 @@
 # mvonderlieth June 2015
 
-ht1 = "The mtcars is a very popular dataset often used in R.  Here we will use it to decompose the formulas that constitute the slope and intercept values of a linear model."
+ht1 = "The mtcars is a very popular dataset often used in R.  Here we will use it to deconstruct the formulas that constitute the slope and intercept values of a linear model."
 ht2 = paste(
            "First select the inputs below to change what is displayed in the Plot, the Summary Output, and the Formulas Table (below the summary)."
            )
