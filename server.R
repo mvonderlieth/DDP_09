@@ -39,18 +39,24 @@ shinyServer(function(input, output, session) {
         y = carData[,response]
         
         # store formula labels and values in df for table output
-        df = data.frame(Formula = character(0), Rcode = character(0), Values = character(0), stringsAsFactors = F)
+        df = data.frame(EquationsAndFormulas = character(0), Rcode = character(0), Values = character(0), stringsAsFactors = F)
 
         # make room now for b0 and b1, will store them here later
-        df[nrow(df) + 1,] = c("","$$Compare\\;b0\\;and\\;b1\\;to\\;Summary\\;Coefficients\\;Estimates$$","")
-        b0Row = b0Row = nrow(df) + 1
+        df[nrow(df) + 1,] = c("","$$Compare\\;these\\;to\\;Summary\\;Values$$","")
+        b0Row = nrow(df) + 1
         df[b0Row,] = c("","","")
 
-        b1Row = b1Row = nrow(df) + 1
+        b1Row = nrow(df) + 1
         df[b1Row,] = c("","","")
-
+        
+        tStatRow = nrow(df) + 1
+        df[tStatRow,] = c("","","")
+        
+        multR2Row = nrow(df) + 1
+        df[multR2Row,] = c("","","")
+        
         # first x,y, and n
-        df[nrow(df) + 1,] = c("","$$b0\\;and\\;b1\\;Decomposed$$","")
+        df[nrow(df) + 1,] = c("","$$Those\\;Values\\;Deconstructed$$","")
         form = "$$x$$"
         df[nrow(df) + 1,] = c(form,"x",toString(round(x,2)))
         form = "$$y$$"
@@ -112,11 +118,11 @@ shinyServer(function(input, output, session) {
         
         # slope is b1 and intercept is b0
         b1 = ssxy/ssx
-        form="$$b1 = \\frac{ssxy}{ssx}$$"
+        form="$$coef x = \\frac{ssxy}{ssx}$$"
         df[b1Row,] = c(form,"b1 = ssxy/ssx",toString(round(b1,4)))
         
         b0 = ymean - (b1 * xmean)
-        form = "$$b0 = ymean - (b1 * xmean)$$"
+        form = "$$intercept = ymean - (b1 * xmean)$$"
         df[b0Row,] = c(form,"b0 = ymean - (b1 * xmean)",toString(round(b0,4)))
         
         # statistics
@@ -159,18 +165,18 @@ shinyServer(function(input, output, session) {
         df[nrow(df) + 1,] = c(form,"r = ssxy / sqrt(ssx * ssy)",toString(round(r,4)))
         # linear determination
         r2 = r^2
-        form = "$$r2 = r^2$$"
+        form = "$$r2\\;(or\\;mult\\;r\\;squared) = r^2$$"
         df[nrow(df) + 1,] = c(form,"r2 = r^2",toString(round(r2,4)))
         
         tStat = (r-0)/sqrt((1-r2)/(n-2))
-        form = "$$tStat = \\frac{(r-0)}{\\sqrt{\\frac{1-r^2}{n-2}}}$$"
-        df[nrow(df) + 1,] = c(form,"tStat = (r-0)/sqrt((1-r2)/(n-2))",toString(round(tStat,3)))
+        form = "$$t\\;value = \\frac{(r-0)}{\\sqrt{\\frac{1-r^2}{n-2}}}$$"
+        df[tStatRow,] = c(form,"tStat = (r-0)/sqrt((1-r2)/(n-2))",toString(round(tStat,3)))
         
         # as per fit summary, Coefficient of determination
         fit = getFit()
         multR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)
-        form = "$$multR2 = 1 - \\frac{fit$residuals^2}{\\sum(y-ymean)}$$"
-        df[nrow(df) + 1,] = c(form,"multR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)",toString(round(multR2,5)))
+        form = "$$Multiple\\;R\\;Squared = 1 - \\frac{fit$residuals^2}{\\sum(y-ymean)}$$"
+        df[multR2Row,] = c(form,"multR2 = 1 - sum(fit$residuals^2)/sum((y - ymean)^2)",toString(round(multR2,5)))
         
         df[nrow(df) + 1,] = c("","$$Actual\\;Values\\;from\\;first\\;x\\;and\\;y$$","")
         sampleXActual = carData[1,predictor]

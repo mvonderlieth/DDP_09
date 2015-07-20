@@ -8,7 +8,7 @@ ht3 = paste(
            "Then look at the Summary Output, and then scroll down the Formulas Table below it.",
            "The Formulas Table develops the slope and intecept by evaluating each formula in turn.",
            "The b0 should match the intercept in the fit summary output, and the b1 value should match the x value.",
-           "The table also shows additional helpful statistics, including the t statistic which should also match the t value for x in the summary.")
+           "The table also shows additional helpful statistics, including the t value and Multiple R-Squared.")
 
 shinyUI(
     fluidPage(
@@ -68,7 +68,7 @@ shinyUI(
         fluidRow(
             column(12,
                    h4("Formulas Table"),
-                   helpText("Here we develop and decompose the model formulas"),
+                   helpText("Here we develop and deconstruct the model formulas"),
                    uiOutput("formulas")
             )
         )
