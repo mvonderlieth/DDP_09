@@ -20,7 +20,8 @@ shinyUI(
             sidebarPanel(
                 helpText(ht1),
                 helpText(ht2),
-                helpText(ht3)
+                helpText(ht3),
+                helpText("author: Mark von der Lieth June 2015")
             ),
             
             mainPanel(

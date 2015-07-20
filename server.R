@@ -261,12 +261,6 @@ shinyServer(function(input, output, session) {
         statsDataList = getStatsData()
         df = data.frame(statsDataList[1])
         actualDf = df[34:36,]
-#         predictor = input$predictor
-#         response = input$response
-#         actualDf[1,1] = predictor
-#         actualDf[2,1] = response
-        
         actualDf
     })
-    
 })
