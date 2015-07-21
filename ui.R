@@ -21,7 +21,8 @@ shinyUI(
                 helpText(ht1),
                 helpText(ht2),
                 helpText(ht3),
-                helpText("author: Mark von der Lieth June 2015")
+                helpText("author: Mark von der Lieth June 2015"),
+                helpText("mtcars help description at bottom of page.")
             ),
             
             mainPanel(
@@ -52,12 +53,12 @@ shinyUI(
         fluidRow(
             column(6,
                    h4("Summary Output"),
-                   helpText("Not showing summary of loess fit as I don't calculate those values, it's just an option so you can see the red line better!"),
+                   helpText("Note: Not showing summary of loess fit as I don't calculate those values, it's just an option so you can see the red line better!"),
                    verbatimTextOutput('summary')
             ),
             column(6,
                    h4("Bonus: Selected Cars"),
-                   helpText("Click and drag in plot to see which points go with which cars.  If you select the first point it should match the values in the table below."),
+                   helpText("Click and drag in plot to see which points go with which cars.  If you select the left most point it should match the values in the table below."),
                    # verbatimTextOutput('click_point'),
                    verbatimTextOutput('brush_points'),
                    tableOutput("actuals")
@@ -71,6 +72,46 @@ shinyUI(
                    h4("Formulas Table"),
                    helpText("Here we develop and deconstruct the model formulas"),
                    uiOutput("formulas")
+            ),
+            
+            hr(),
+            
+            column(12,
+                   h4("mtcars {datasets}	R Documentation"),
+                   helpText("Motor Trend Car Road Tests"),
+                   helpText(""),
+                   helpText("Description"),
+                   helpText(""),
+                   helpText("The data was extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973–74 models)."),
+                   helpText(""),
+                   helpText("Usage"),
+                   helpText(""),
+                   helpText("mtcars"),
+                   helpText("Format"),
+                   helpText(""),
+                   helpText("A data frame with 32 observations on 11 variables."),
+                   helpText(""),
+                   helpText("[, 1]	mpg	Miles/(US) gallon"),
+                   helpText("[, 2]	cyl	Number of cylinders"),
+                   helpText("[, 3]	disp	Displacement (cu.in.)"),
+                   helpText("[, 4]	hp	Gross horsepower"),
+                   helpText("[, 5]	drat	Rear axle ratio"),
+                   helpText("[, 6]	wt	Weight (lb/1000)"),
+                   helpText("[, 7]	qsec	1/4 mile time"),
+                   helpText("[, 8]	vs	V/S"),
+                   helpText("[, 9]	am	Transmission (0 = automatic, 1 = manual)"),
+                   helpText("[,10]	gear	Number of forward gears"),
+                   helpText("[,11]	carb	Number of carburetors"),
+                   helpText("Source"),
+                   helpText(""),
+                   helpText("Henderson and Velleman (1981), Building multiple regression models interactively. Biometrics, 37, 391–411."),
+                   helpText(""),
+                   helpText("Examples"),
+                   helpText(""),
+                   helpText("require(graphics)"),
+                   helpText("pairs(mtcars, main = \"mtcars data\")"),
+                   helpText("coplot(mpg ~ disp | as.factor(cyl), data = mtcars,"),
+                   helpText("       panel = panel.smooth, rows = 1")
             )
         )
     )
